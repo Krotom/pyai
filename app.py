@@ -4,7 +4,7 @@ from transformers import pipeline
 app = Flask(__name__)
 
 # Load a conversational AI model
-chatbot = pipeline('conversational', model='microsoft/DialoGPT-small')
+chatbot = pipeline('text-generation', model='microsoft/DialoGPT-small')
 
 
 @app.route('/chat', methods=['POST'])
