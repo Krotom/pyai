@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from transformers import pipeline
+from psutil import virtual_memory
 
 app = Flask(__name__)
 
@@ -9,6 +10,7 @@ chatbot = pipeline('text-generation', model='sshleifer/tiny-gpt2')
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    print("Mem Usage: ", virtual_memory().percent, "%")
     user_input = request.json.get("message")
     if not user_input:
         return jsonify({"error": "Message is required"}), 400
