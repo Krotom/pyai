@@ -13,7 +13,10 @@ def chat():
     if not user_input:
         return jsonify({"error": "Message is required"}), 400
 
-    response = chatbot(user_input)
+    if len(user_input) > 100:  # Limit to 100 characters
+        return jsonify({"error": "Message too long, please shorten your input"}), 400
+        
+    response = chatbot(user_input, max_length=50)
     return jsonify({"response": response[0]['generated_text']})
 
 
