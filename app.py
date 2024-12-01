@@ -1,25 +1,33 @@
 from flask import Flask, request, jsonify
-from transformers import pipeline
-from psutil import virtual_memory
+from openai import OpenAI
 
+history = []
+base_url = "https://api.aimlapi.com/v1"
+api_key = "7ae3a9a75e99458cb771a2e52134e8cb"
+system_prompt = "Be descriptive and helpful."
 app = Flask(__name__)
-
-# Load a conversational AI model
-chatbot = pipeline('text-generation', model='sshleifer/tiny-gpt2')
+api = OpenAI(api_key=api_key, base_url=base_url)
+history.append(system_prompt)
 
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    print("Mem Usage: ", virtual_memory().percent, "%")
     user_input = request.json.get("message")
     if not user_input:
         return jsonify({"error": "Message is required"}), 400
+    completion = api.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_input},
+        ],
+        temperature=0.7,
+        max_tokens=256,
+    )
 
-    if len(user_input) > 100:  # Limit to 100 characters
-        return jsonify({"error": "Message too long, please shorten your input"}), 400
-        
-    response = chatbot(user_input, max_length=50)
-    return jsonify({"response": response[0]['generated_text']})
+    response = completion.choices[0].message.content
+    history.append(user_input)
+    return jsonify({"response": response})
 
 
 if __name__ == '__main__':
