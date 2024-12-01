@@ -1,5 +1,4 @@
 gunicorn
 flask
-transformers
-torch
+openai
 psutil
